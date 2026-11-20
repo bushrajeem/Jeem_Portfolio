@@ -1,0 +1,559 @@
+/**
+ * Single source of truth for the portfolio.
+ * Every value below is taken from Taslima Bushra Islam Jeem's CV or her public
+ * GitHub (github.com/bushrajeem). Update GPA, projects or links here only.
+ */
+
+export const profile = {
+  name: "Taslima Bushra Islam Jeem",
+  shortName: "Jeem",
+  role: "Web Developer & AI/ML Enthusiast",
+  roleLines: ["Web Developer", "& AI/ML Enthusiast."],
+  location: "Dhaka, Bangladesh",
+  email: "bushrajeem32@gmail.com",
+  github: "https://github.com/bushrajeem",
+  githubHandle: "bushrajeem",
+  linkedin: "https://www.linkedin.com/in/bushra-jeem",
+  resume: "/Taslima-Bushra-Islam-Jeem-CV.pdf",
+  portrait: "/jeem-portrait.jpg",
+  year: 2026,
+  seeking: "a web development or AI/ML internship or entry-level role",
+};
+
+export const academics = {
+  degree: "B.Sc. in Computer Science & Engineering",
+  degreeShort: "B.Sc. CSE",
+  university: "University of Liberal Arts Bangladesh",
+  universityShort: "ULAB",
+  standing: "4th-year undergraduate",
+  cgpa: "3.90",
+  scale: "4.00",
+  period: "2023 – Present",
+};
+
+/** Hero typed line + big display title. */
+export const hero = {
+  titleLines: ["SOFTWARE", "ENGINEER"],
+  focus: `/AI & FULL-STACK DEVELOPMENT`,
+};
+
+export const bio = {
+  lead: [
+    { text: "I build " },
+    { text: "real-time web apps", strong: true },
+    { text: " with React and Node.js, and I’m growing into " },
+    { text: "Artificial Intelligence and ", strong: true },
+    { text: "Machine Learning", strong: true },
+  ],
+};
+
+export type SkillGroup = {
+  id: string;
+  title: string;
+  note: string;
+  items: string[];
+};
+
+export const skills: SkillGroup[] = [
+  {
+    id: "web",
+    title: "Languages & Web Development",
+    note: "Front-end interfaces, real-time features and Node.js back ends",
+    items: [
+      "JavaScript",
+      "TypeScript",
+      "Python",
+      "C",
+      "React",
+      "Node.js",
+      "Express",
+      "Vite",
+      "Tailwind CSS",
+      "HTML5",
+      "CSS3",
+      "Socket.IO",
+    ],
+  },
+  {
+    id: "ml",
+    title: "AI & Machine Learning",
+    note: "Supervised learning, neural networks and model pipelines",
+    items: [
+      "Supervised Learning",
+      "Regression",
+      "Classification",
+      "Neural Networks",
+      "Learning Algorithms",
+      "scikit-learn",
+      "Pandas",
+      "Gradio",
+    ],
+  },
+  {
+    id: "tools",
+    title: "Tools, Data & Testing",
+    note: "Version control, databases, deployment and testing",
+    items: [
+      "Git",
+      "GitHub",
+      "MongoDB",
+      "Firebase",
+      "Cloudinary",
+      "Vercel",
+      "Jest",
+      "Playwright",
+      "Trello",
+      "Microsoft Office",
+    ],
+  },
+];
+
+export type ProjectLink = { label: string; href: string };
+
+export type ArchitectureMode = {
+  id: string;
+  label: string;
+  input: string;
+  router: { title: string; caption: string };
+  targets: { title: string; caption: string }[];
+  activeTarget: number;
+  explanation: string;
+};
+
+export type Project = {
+  id: string;
+  name: string;
+  tagline: string;
+  category: string;
+  summary: string;
+  stack: string[];
+  links: ProjectLink[];
+  /** Real snippet shown in the preview window (file tree / code from the repo). */
+  preview: { address: string; lines: string[]; tone: string };
+  /** Text shown on the paper sheet inside the folder. */
+  paper: { label: string; headline: [string, string]; caption: string };
+  outcome: string;
+  description: string;
+  highlights: string[];
+  architecture?: ArchitectureMode[];
+};
+
+export const projects: Project[] = [
+  {
+    id: "adflow",
+    name: "AdFlow Network",
+    tagline: "Real-time DOOH platform",
+    category: "Digital out-of-home advertising management",
+    summary:
+      "A cloud platform where brands upload video ads that play on screens in local supershops — one dashboard controls every screen in real time.",
+    stack: [
+      "React",
+      "Vite",
+      "Tailwind CSS",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Socket.IO",
+      "Cloudinary",
+      "Python",
+    ],
+    links: [
+      { label: "Live app", href: "https://ad-flow-network-dooh-advertising-sy.vercel.app/" },
+      { label: "Source", href: "https://github.com/bushrajeem/AdFlow-Network-DOOH-Advertising-System" },
+    ],
+    preview: {
+      address: "ad-flow-network-dooh-advertising-sy.vercel.app",
+      tone: "image-adflow",
+      lines: [
+        "adflow-network/",
+        "├── src/pages/admin/",
+        "│   ├── AdminDashboardPage.jsx",
+        "│   ├── ScreenPage.jsx",
+        "│   └── PlaylistsPage.jsx",
+        "├── src/pages/player/PlayerPage.jsx",
+        "└── backend/",
+        "    ├── controllers/",
+        "    ├── models/  Ad · Screen · Playlist",
+        "    ├── socket.js",
+        "    └── server.js",
+      ],
+    },
+    paper: { label: "Socket.IO · MongoDB", headline: ["One dashboard,", "every screen."], caption: "Admin + screen player" },
+    outcome: "Playlist changes reach screens instantly — no refresh needed.",
+    description:
+      "Any device becomes a digital screen by opening a short screen code (player/XX-0000). The admin dashboard manages screens, ads, playlists and locations, while a Socket.IO channel pushes playlist assignments to devices and streams their heartbeat back so Online/Offline status updates live. Videos are stored on Cloudinary and data lives in MongoDB Atlas behind a REST API built with Express.",
+    highlights: [
+      "Real-time: Socket.IO between the admin dashboard and screen devices.",
+      "REST API for ads, screens, playlists, locations, dashboard stats and users.",
+      "Deployment: Vercel frontend, Render backend, MongoDB Atlas, Cloudinary media.",
+    ],
+    architecture: [
+      {
+        id: "push",
+        label: "Playlist push",
+        input: "Admin assigns playlist",
+        router: { title: "Socket.IO server", caption: "Real-time event channel" },
+        targets: [
+          { title: "Screen player", caption: "Loops the new playlist" },
+          { title: "Admin dashboard", caption: "Live screen status" },
+        ],
+        activeTarget: 0,
+        explanation: "Assignments are pushed to the device instantly — the player updates without a page refresh.",
+      },
+      {
+        id: "heartbeat",
+        label: "Heartbeat",
+        input: "Screen device online",
+        router: { title: "Socket.IO server", caption: "Real-time event channel" },
+        targets: [
+          { title: "Screen player", caption: "Loops the new playlist" },
+          { title: "Admin dashboard", caption: "Live screen status" },
+        ],
+        activeTarget: 1,
+        explanation: "Each screen sends a heartbeat to stay Online; the admin panel reflects status changes live.",
+      },
+    ],
+  },
+  {
+    id: "briq",
+    name: "BRIQ",
+    tagline: "Cinematic 3D storefront",
+    category: "Premium red bricks · Interactive product site",
+    summary:
+      "A cinematic, motion-driven storefront for premium red bricks built with React Three Fiber, GSAP and smooth scrolling.",
+    stack: ["TypeScript", "React", "Three.js", "React Three Fiber", "GSAP", "Framer Motion", "Lenis", "Zustand", "Tailwind CSS"],
+    links: [
+      { label: "Live app", href: "https://briq-sigma.vercel.app" },
+      { label: "Source", href: "https://github.com/bushrajeem/BRIQ" },
+    ],
+    preview: {
+      address: "briq-sigma.vercel.app",
+      tone: "image-briq",
+      lines: [
+        "src/",
+        "├── components/",
+        "│   ├── CinematicSequence.tsx",
+        "│   ├── FeaturedBrick.tsx",
+        "│   ├── Shop.tsx · CartDrawer.tsx",
+        "│   ├── LoadingScreen.tsx",
+        "│   └── effects/ParticleCanvas.tsx",
+        "├── hooks/useLenis.ts",
+        "└── store/useStore.ts",
+      ],
+    },
+    paper: { label: "Three.js · GSAP", headline: ["Bricks, made", "cinematic."], caption: "3D product experience" },
+    outcome: "A full storefront flow — story, shop, cart and contact — in one scroll.",
+    description:
+      "BRIQ pairs a 3D featured-brick scene (React Three Fiber + drei) and a particle canvas with a GSAP-driven cinematic sequence and Lenis smooth scrolling. A Zustand store powers the shop and slide-out cart drawer, and the site is written end to end in TypeScript.",
+    highlights: [
+      "3D: React Three Fiber scene with a featured brick and particle effects.",
+      "State: Zustand store shared by the shop grid and cart drawer.",
+    ],
+  },
+  {
+    id: "ad-click",
+    name: "Ad Click Prediction",
+    tagline: "Supervised ML pipeline",
+    category: "Binary classification · Social network ads",
+    summary:
+      "Predicts whether a social-network user will click an ad from gender, age and estimated salary, served through a Gradio interface.",
+    stack: ["Python", "scikit-learn", "Pandas", "NumPy", "Logistic Regression", "GridSearchCV", "Gradio"],
+    links: [{ label: "Source", href: "https://github.com/bushrajeem/social-network-ads-click-prediction" }],
+    preview: {
+      address: "social-network-ads-click-prediction/lr_train.py",
+      tone: "image-ml",
+      lines: [
+        "pipeline = Pipeline(steps=[",
+        "  (\"preprocessing\", ColumnTransformer([",
+        "     (\"num\", StandardScaler(), [\"Age\", \"EstimatedSalary\"]),",
+        "     (\"cat\", OneHotEncoder(drop=\"first\"), [\"Gender\"]) ])),",
+        "  (\"model\", LogisticRegression()) ])",
+        "",
+        "grid = GridSearchCV(pipeline,",
+        "  {\"model__C\": [0.01, 0.1, 1, 10, 100]}, cv=5)",
+      ],
+    },
+    paper: { label: "scikit-learn · Gradio", headline: ["Will they", "click the ad?"], caption: "Logistic regression" },
+    outcome: "Returns a click / no-click verdict with its predicted probability.",
+    description:
+      "A clean scikit-learn workflow: a ColumnTransformer scales numerical features and one-hot encodes gender, feeding a logistic-regression model chosen for a small, tabular binary-classification problem. The pipeline is validated with 5-fold cross-validation, tuned with GridSearchCV over the regularisation strength, evaluated with a classification report and confusion matrix, then pickled and served through a Gradio app with sliders for age and salary.",
+    highlights: [
+      "Leak-free preprocessing inside a single scikit-learn Pipeline.",
+      "Model selection with 5-fold CV and GridSearchCV hyper-parameter tuning.",
+    ],
+  },
+  {
+    id: "mindbalance",
+    name: "MindBalance",
+    tagline: "Appointment booking app",
+    category: "Services · Authentication & booking",
+    summary:
+      "A TypeScript React app with Firebase authentication (including Google sign-in), service pages and an appointment booking flow.",
+    stack: ["TypeScript", "React", "Firebase", "React Router", "Tailwind CSS", "Radix UI", "Framer Motion"],
+    links: [{ label: "Source", href: "https://github.com/bushrajeem/MindBalance" }],
+    preview: {
+      address: "github.com/bushrajeem/MindBalance",
+      tone: "image-mind",
+      lines: [
+        "src/",
+        "├── features/",
+        "│   ├── auth/  Login · Register · Google",
+        "│   └── booking/BookingForm.tsx",
+        "├── pages/",
+        "│   ├── Services.tsx",
+        "│   ├── Appointment.tsx",
+        "│   └── AboutUs.tsx",
+        "└── components/ui/  button · card · input",
+      ],
+    },
+    paper: { label: "Firebase · Radix UI", headline: ["Sign in,", "then book."], caption: "Auth + booking flow" },
+    outcome: "Users sign up, browse services and book appointments in one flow.",
+    description:
+      "Organised by feature: an auth module (email/password registration, login and Google sign-in via Firebase) and a booking module with an appointment form, alongside services and about pages. The UI is built from accessible Radix-based primitives styled with Tailwind CSS, with toast feedback and motion.",
+    highlights: [
+      "Feature-based folder structure: auth, booking, layouts, pages.",
+      "Reusable UI primitives (button, card, input, label) with class-variance-authority.",
+    ],
+  },
+  {
+    id: "chatting-app",
+    name: "Chatting App",
+    tagline: "Real-time messaging",
+    category: "Messaging · Friends & requests",
+    summary:
+      "A Firebase-backed chat dashboard with conversations, a friends list and friend requests, built in TypeScript.",
+    stack: ["TypeScript", "React", "Firebase", "React Router", "Tailwind CSS", "Radix UI"],
+    links: [{ label: "Source", href: "https://github.com/bushrajeem/chattingApp" }],
+    preview: {
+      address: "github.com/bushrajeem/chattingApp",
+      tone: "image-chat",
+      lines: [
+        "src/pages/Dashboard/",
+        "├── chats/components/",
+        "│   ├── ChatLayout.tsx",
+        "│   ├── ChatSidebar.tsx",
+        "│   ├── ChatwindowLayout.tsx",
+        "│   └── ConvoDialog.tsx",
+        "├── friends/Friends.tsx",
+        "└── request/Request.tsx",
+      ],
+    },
+    paper: { label: "Firebase · TypeScript", headline: ["Friends, requests", "and chats."], caption: "Messaging dashboard" },
+    outcome: "A sidebar dashboard for chats, friends and incoming requests.",
+    description:
+      "A dashboard layout with a collapsible app sidebar routes between chats, friends and requests. Conversations open in a chat window with a dialog for starting new ones, and Firebase handles authentication and data.",
+    highlights: ["Dashboard shell with sidebar navigation and a responsive mobile hook."],
+  },
+  {
+    id: "task-kanban",
+    name: "Task Kanban",
+    tagline: "Task management board",
+    category: "Productivity · Kanban board",
+    summary:
+      "A Kanban-style task manager with Firebase authentication and a column-based dashboard, written in TypeScript.",
+    stack: ["TypeScript", "React", "Firebase", "Tailwind CSS", "Lucide"],
+    links: [{ label: "Source", href: "https://github.com/bushrajeem/task-kanban" }],
+    preview: {
+      address: "github.com/bushrajeem/task-kanban",
+      tone: "image-kanban",
+      lines: [
+        "src/",
+        "├── pages/",
+        "│   ├── Auth.tsx",
+        "│   └── Dashboard.tsx",
+        "├── components/",
+        "│   ├── Column.tsx",
+        "│   └── TaskCard.tsx",
+        "├── types/task.ts",
+        "└── firebase.ts",
+      ],
+    },
+    paper: { label: "Firebase · TypeScript", headline: ["To do, doing,", "done."], caption: "Kanban board" },
+    outcome: "Signed-in users organise tasks across board columns.",
+    description:
+      "Typed task models feed a dashboard of columns and task cards, with an auth page in front and Firebase as the backend.",
+    highlights: ["Strongly typed task model shared across columns and cards."],
+  },
+];
+
+/** Smaller builds listed under the folders. */
+// export const archive: { name: string; stack: string; links: ProjectLink[] }[] = [
+//   {
+//     name: "E-Commerce (CRUD)",
+//     stack: "React · json-server · Tailwind CSS",
+//     links: [{ label: "Source", href: "https://github.com/bushrajeem/ecom-cudOP" }],
+//   },
+//   {
+//     name: "Educart",
+//     stack: "React · React Router · Tailwind CSS",
+//     links: [{ label: "Source", href: "https://github.com/bushrajeem/educart" }],
+//   },
+//   {
+//     name: "Book Store",
+//     stack: "React · shadcn/ui · Node server",
+//     links: [{ label: "Source", href: "https://github.com/bushrajeem/bookStore" }],
+//   },
+//   {
+//     name: "ULAB Shop",
+//     stack: "PHP · SQL · CSS",
+//     links: [
+//       { label: "Live", href: "https://ulab-shop.vercel.app" },
+//       { label: "Source", href: "https://github.com/bushrajeem/ULAB_Shop" },
+//     ],
+//   },
+//   {
+//     name: "Shopping Cart",
+//     stack: "HTML · CSS · Vanilla JavaScript",
+//     links: [
+//       { label: "Live", href: "https://simple-shop-lilac.vercel.app" },
+//       { label: "Source", href: "https://github.com/bushrajeem/simpleShop" },
+//     ],
+//   },
+//   {
+//     name: "Dessert Shop",
+//     stack: "HTML · CSS",
+//     links: [
+//       { label: "Live", href: "https://sweetshop-eight.vercel.app" },
+//       { label: "Source", href: "https://github.com/bushrajeem/Sweetshop" },
+//     ],
+//   },
+//   {
+//     name: "Travel Landing Page",
+//     stack: "HTML5 · CSS3",
+//     links: [{ label: "Source", href: "https://github.com/bushrajeem/travel" }],
+//   },
+// ];
+
+export type JourneyStop = {
+  id: string;
+  date: string;
+  current?: boolean;
+  title: string;
+  place: string;
+  placeNote?: string;
+  description: string;
+  offset: "low" | "high";
+};
+
+export const journey: JourneyStop[] = [
+  {
+    id: "bsc",
+    date: academics.period,
+    current: true,
+    title: academics.degreeShort,
+    place: academics.university,
+    placeNote: `${academics.standing} · CGPA ${academics.cgpa} / ${academics.scale}`,
+    description: "Building full-stack web applications alongside a growing foundation in machine learning.",
+    offset: "low",
+  },
+  {
+    id: "hult",
+    date: "2025 – 2026",
+    title: "Hult Prize, 1st Runner-Up",
+    place: "Hult Prize ULAB",
+    placeNote: "National round participant",
+    description: "Placed 1st runner-up in the ULAB on-campus round and advanced to the national round.",
+    offset: "high",
+  },
+  {
+    id: "ucpc",
+    date: "Leadership",
+    title: "Sub-Executive",
+    place: "ULAB Computer & Programming Club",
+    placeNote: "UCPC",
+    description: "Contributing to club activities and events for the university’s computing community.",
+    offset: "low",
+  },
+  {
+    id: "ml",
+    date: "Coursera",
+    title: "Machine Learning Certifications",
+    place: "DeepLearning.AI & Stanford",
+    placeNote: "Two certified courses",
+    description: "Supervised Machine Learning: Regression and Classification, and Advanced Learning Algorithms.",
+    offset: "high",
+  },
+  {
+    id: "hsc",
+    date: "2020 – 2022",
+    title: "HSC, Science",
+    place: "Mohammadpur Preparatory College",
+    placeNote: "Dhaka · SSC 2015 – 2020",
+    description: "Higher Secondary and Secondary School Certificates in the science group.",
+    offset: "low",
+  },
+];
+
+export const milestones: { group: string; items: { title: string; detail: string }[] }[] = [
+  {
+    group: "Competitions",
+    items: [
+      { title: "Hult Prize 25-26", detail: "1st Runner-Up · National Round Participant" },
+      { title: "Brand Aid 2.0", detail: "Semi-finalist · Inter Business Case Competition" },
+      { title: "HSBC Case Competition", detail: "Participant · also Capitalizer and Breaking Brand" },
+      { title: "AI Hackathon", detail: "Participant · AI buildfest" },
+    ],
+  },
+  {
+    group: "Volunteering",
+    items: [
+      { title: "Central Volunteer", detail: "ULAB Convocation · security, protocol and crowds for 500+ guests" },
+      { title: "Deputy Head of Hospitality", detail: "Vox 3.0 National Debating Competition" },
+      { title: "Event & production support", detail: "7UP TVC/OVC commercial shoot · university concerts" },
+    ],
+  },
+  {
+    group: "Languages",
+    items: [
+      { title: "English", detail: "Professional · IELTS band 7.0" },
+      { title: "Bengali", detail: "Native" },
+    ],
+  },
+];
+
+export const navLinks = [
+  { label: "About", href: "#biography" },
+  { label: "Skills", href: "#skills" },
+  { label: "Projects", href: "#projects" },
+  { label: "Experience", href: "#experience" },
+  { label: "Contact", href: "#contact" },
+];
+
+/** Background code shown faintly behind the hero, generated from real data. */
+export const heroCode = `const jeem = {
+  name: "${profile.name}",
+  role: "${profile.role}",
+  location: "${profile.location}",
+  education: {
+    degree: "${academics.degree}",
+    university: "${academics.university}",
+    standing: "${academics.standing}",
+    cgpa: ${academics.cgpa}
+  },
+  projects: {
+    AdFlow: "Real-time DOOH advertising platform",
+    BRIQ: "Cinematic 3D storefront",
+    AdClick: "Logistic-regression click prediction"
+  },
+  skills: {
+    web: ["React", "Node.js", "Vite", "Tailwind CSS", "Socket.IO"],
+    languages: ["JavaScript", "TypeScript", "Python", "C"],
+    ml: ["Supervised Learning", "Neural Networks", "scikit-learn"],
+    tools: ["Git", "GitHub", "Jest", "Playwright", "Trello"]
+  },
+  achievements: ["Hult Prize ULAB 1st Runner-Up", "Brand Aid 2.0 Semi-finalist"],
+  email: "${profile.email}",
+  github: "${profile.github}",
+  linkedin: "${profile.linkedin}"
+};
+
+export default function Portfolio() {
+  return <main>
+    <header><h1>{jeem.name}</h1><p>{jeem.role}</p></header>
+    <section><h2>Projects</h2>
+      {Object.entries(jeem.projects).map(([name, detail]) =>
+        <article key={name}><h3>{name}</h3><p>{detail}</p></article>)}
+    </section>
+    <footer><a href={"mailto:" + jeem.email}>Let's talk.</a></footer>
+  </main>;
+}`;
