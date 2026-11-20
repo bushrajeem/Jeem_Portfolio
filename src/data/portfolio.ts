@@ -14,7 +14,7 @@ export const profile = {
   github: "https://github.com/bushrajeem",
   githubHandle: "bushrajeem",
   linkedin: "https://www.linkedin.com/in/bushra-jeem",
-  resume: "/Taslima-Bushra-Islam-Jeem-CV.pdf",
+  resume: "/Taslima_Bushra_Islam_Jeem_CV.pdf",
   portrait: "/jeem-portrait.jpg",
   year: 2026,
   seeking: "a web development or AI/ML internship or entry-level role",
