@@ -302,7 +302,7 @@ export function FooterCrowd() {
         <img
           ref={portraitRef}
           className="footer-crowd-portrait"
-          src="/footer/animated_jeem.webp"
+          src={profile.footerPortrait || "/footer/animated_jeem.webp"}
           alt=""
           loading="lazy"
         />

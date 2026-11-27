@@ -18,6 +18,7 @@ export type ProfileData = {
   linkedin: string;
   resume: string;
   portrait: string;
+  footerPortrait?: string;
   year: number;
   seeking: string;
 };

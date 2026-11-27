@@ -1104,6 +1104,172 @@
   }
 }
 
+/* ── Media Upload & Live Preview ── */
+.adm-media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.adm-media-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--sc-canvas);
+  border: 1px solid var(--line);
+  min-width: 0;
+}
+
+.adm-media-pane-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.adm-media-stage {
+  height: 240px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+}
+
+.adm-media-stage.is-staged {
+  border-color: var(--adm-warn);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--adm-warn) 22%, transparent);
+}
+
+.adm-media-stage.is-pdf {
+  height: 280px;
+}
+
+.adm-media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.adm-media-img.is-contain {
+  object-fit: contain;
+  padding: 10px;
+}
+
+.adm-pdf-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+
+.adm-media-url {
+  font-size: 11px;
+  color: var(--sc-ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-dropzone {
+  flex: 1;
+  min-height: 240px;
+  border: 2px dashed var(--line);
+  border-radius: 10px;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color 0.16s, background-color 0.16s;
+}
+
+.adm-dropzone:hover,
+.adm-dropzone.is-dragover {
+  border-color: var(--sc-ink);
+  background: var(--sc-surface);
+}
+
+.adm-dropzone-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--sc-surface);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+}
+
+.adm-dropzone strong {
+  font-size: 13.5px;
+}
+
+.adm-dropzone span {
+  font-size: 12px;
+  color: var(--sc-ink-soft);
+  max-width: 30ch;
+}
+
+.adm-progress-track {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  overflow: hidden;
+}
+
+.adm-progress-fill {
+  height: 100%;
+  background: var(--sc-ink);
+  transition: width 0.2s ease;
+}
+
+.adm-media-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── Live Deployed Site Preview Frame ── */
+.adm-site-preview-wrap {
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--sc-canvas);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+.adm-site-preview-wrap.is-mobile {
+  padding: 16px;
+  background: var(--surface-strong);
+}
+
+.adm-site-frame {
+  width: 100%;
+  height: 540px;
+  border: 0;
+  background: var(--sc-canvas);
+}
+
+.adm-site-preview-wrap.is-mobile .adm-site-frame {
+  width: 390px;
+  max-width: 100%;
+  height: 640px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  box-shadow: 0 20px 44px -20px #0006;
+}
+
 /* ── Mobile Drawer Overlay ── */
 .adm-drawer-backdrop {
   display: none;
@@ -1156,7 +1322,8 @@
   }
 
   .adm-grid-2,
-  .adm-grid-3 {
+  .adm-grid-3,
+  .adm-media-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 

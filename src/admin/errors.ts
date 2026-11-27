@@ -39,6 +39,15 @@ export function describeError(err: unknown): string {
       return "This Google account has been disabled in Firebase.";
     case "auth/internal-error":
       return "Firebase Auth had an internal error. Refresh the page and try again.";
+    case "storage/unauthorized":
+      return "Firebase Storage rejected this upload. Publish storage.rules with your UID (or configure free Cloudinary keys in .env.local / Vercel).";
+    case "storage/bucket-not-found":
+    case "storage/project-not-found":
+      return "Firebase Storage bucket is not enabled yet. Enable Storage in Firebase Console or configure free Cloudinary upload keys.";
+    case "storage/canceled":
+      return "Upload was cancelled.";
+    case "storage/retry-limit-exceeded":
+      return "Upload timed out. Check your connection and try again.";
     default:
       return err instanceof Error && err.message ? err.message : "Something unexpected happened.";
   }

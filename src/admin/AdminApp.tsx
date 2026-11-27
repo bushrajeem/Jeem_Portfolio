@@ -9,6 +9,7 @@ import {
   Copy,
   FolderGit2,
   GitBranch,
+  Image as ImageIcon,
   Inbox,
   KeyRound,
   LayoutDashboard,
@@ -30,8 +31,10 @@ import { isFirebaseConfigured } from "../lib/firebase";
 import {
   IDLE_TIMEOUT_MS,
   MAX_SESSION_MS,
+  OWNER_EMAIL,
   getSessionStartedAt,
   isGoogleVerified,
+  isOwnerEmail,
   signInWithGoogle,
   signOutAdmin,
   verifyAdminAccess,
@@ -43,6 +46,7 @@ import { AdminSessionProvider, useAdminSession } from "./session";
 import { BioAcademicsSection } from "./sections/BioAcademicsSection";
 import { ExperienceSection } from "./sections/ExperienceSection";
 import { InboxSection } from "./sections/InboxSection";
+import { MediaSection } from "./sections/MediaSection";
 import { OverviewSection, type AdminTabId } from "./sections/OverviewSection";
 import { ProfileHeroSection } from "./sections/ProfileHeroSection";
 import { ProjectsSection } from "./sections/ProjectsSection";
@@ -66,6 +70,7 @@ const NAV_ITEMS: Array<{
   { id: "overview", label: "Overview", group: "workspace", icon: LayoutDashboard },
   { id: "inbox", label: "Contact Inbox", group: "workspace", icon: Inbox },
   { id: "profile", label: "Profile, Hero & Nav", group: "content", icon: UserCircle2 },
+  { id: "media", label: "Media & CV", group: "content", icon: ImageIcon },
   { id: "bio", label: "Bio & Academics", group: "content", icon: BookOpen },
   { id: "skills", label: "Skills & Stack", group: "content", icon: Wrench },
   { id: "projects", label: "Projects", group: "content", icon: FolderGit2 },
@@ -114,11 +119,11 @@ export default function AdminApp() {
 
     setGate({ kind: "checking" });
 
-    if (!isGoogleVerified(user)) {
+    if (!isGoogleVerified(user) || !isOwnerEmail(user)) {
+      await signOutAdmin().catch(() => undefined);
       setGate({
-        kind: "unauthorized",
-        user,
-        reason: "Only verified Google accounts (google.com provider) can access this admin studio.",
+        kind: "signed-out",
+        notice: "Access denied. Only the verified portfolio owner account is permitted to enter Admin Studio.",
       });
       return;
     }
@@ -291,15 +296,15 @@ export default function AdminApp() {
               <div className="adm-gate-checks">
                 <div className="adm-gate-check">
                   <ShieldCheck size={15} aria-hidden="true" />
-                  <span>Server-enforced UID allowlist in Firestore Rules</span>
+                  <span>Locked exclusively to owner Google account ({OWNER_EMAIL.replace(/(^.).*(@.*$)/, "$1••••$2")})</span>
                 </div>
                 <div className="adm-gate-check">
                   <Lock size={15} aria-hidden="true" />
-                  <span>Tab-only session persistence + 15-minute idle auto-lock</span>
+                  <span>Server-enforced email + UID rules &amp; 15-minute idle auto-lock</span>
                 </div>
                 <div className="adm-gate-check">
                   <KeyRound size={15} aria-hidden="true" />
-                  <span>Every write is validated &amp; recorded in an append-only audit log</span>
+                  <span>Every edit &amp; upload is validated and logged in an immutable audit log</span>
                 </div>
               </div>
 
@@ -643,6 +648,7 @@ function AuthorizedWorkspace({
             <OverviewSection unreadCount={unreadCount} onNavigate={(next) => void navigate(next)} />
           )}
           {tab === "profile" && <ProfileHeroSection />}
+          {tab === "media" && <MediaSection />}
           {tab === "bio" && <BioAcademicsSection />}
           {tab === "skills" && <SkillsSection />}
           {tab === "projects" && <ProjectsSection />}

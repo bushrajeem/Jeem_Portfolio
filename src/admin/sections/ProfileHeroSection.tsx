@@ -64,6 +64,7 @@ function ProfileEditor() {
     c.href("LinkedIn URL", v.linkedin);
     c.href("Resume PDF path/URL", v.resume);
     c.image("Portrait path/URL", v.portrait);
+    if (v.footerPortrait) c.image("Footer portrait path/URL", v.footerPortrait);
     c.check(Number.isInteger(v.year) && v.year >= 2020 && v.year <= 2100, "Year must be between 2020 and 2100.");
     c.required("Seeking statement", v.seeking, 220);
     return c.issues;

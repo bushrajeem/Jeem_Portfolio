@@ -117,6 +117,7 @@ export function normalizeProfile(raw: Record<string, unknown>): ProfileData {
     linkedin: safeHref(raw.linkedin, d.linkedin),
     resume: safeHref(raw.resume, d.resume),
     portrait: safeImageSrc(raw.portrait, d.portrait),
+    footerPortrait: safeImageSrc(raw.footerPortrait, d.footerPortrait ?? "/footer/animated_jeem.webp"),
     year: asNumber(raw.year, d.year),
     seeking: asString(raw.seeking, d.seeking),
   };

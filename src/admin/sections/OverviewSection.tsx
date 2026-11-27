@@ -7,8 +7,10 @@ import {
   Download,
   Loader2,
   Mail,
+  Monitor,
   RefreshCw,
   ShieldCheck,
+  Smartphone,
 } from "lucide-react";
 import {
   COLLECTION_KEYS,
@@ -26,6 +28,7 @@ import { commitTitle, useAdminSession } from "../session";
 export type AdminTabId =
   | "overview"
   | "profile"
+  | "media"
   | "bio"
   | "skills"
   | "projects"
@@ -45,6 +48,8 @@ export function OverviewSection({
   const [loading, setLoading] = useState(true);
   const [publishing, setPublishing] = useState(false);
   const [audit, setAudit] = useState<AuditEntry[]>([]);
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
+  const [previewKey, setPreviewKey] = useState(0);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -194,6 +199,7 @@ export function OverviewSection({
           <div style={{ display: "grid", gap: 8 }}>
             {[
               { label: "Profile, Hero & Navigation", keys: ["profile", "hero", "navigation"] as const, tab: "profile" as AdminTabId },
+              { label: "Media, Portrait & CV PDF", keys: ["profile"] as const, tab: "media" as AdminTabId },
               { label: "Biography & Academics", keys: ["bio", "academics"] as const, tab: "bio" as AdminTabId },
               { label: "Skills & Tech Stack", keys: ["skills"] as const, tab: "skills" as AdminTabId },
               { label: "Featured Projects", keys: ["projects"] as const, tab: "projects" as AdminTabId },
@@ -278,6 +284,64 @@ export function OverviewSection({
               <span>Security Check</span>
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Live Preview of Currently Deployed Portfolio */}
+      <div className="adm-card">
+        <div className="adm-card-head">
+          <div className="adm-card-title">
+            <Monitor size={16} aria-hidden="true" />
+            <div>
+              <h2>Currently Deployed Portfolio Preview</h2>
+              <p style={{ margin: "2px 0 0", fontSize: 12.5, color: "var(--sc-ink-soft)" }}>
+                Live view of your deployed site — updates automatically whenever you commit changes.
+              </p>
+            </div>
+          </div>
+
+          <div className="adm-card-controls">
+            <div className="adm-tabs" role="group" aria-label="Preview viewport size">
+              <button
+                type="button"
+                className={`adm-tab${previewDevice === "desktop" ? " is-active" : ""}`}
+                onClick={() => setPreviewDevice("desktop")}
+              >
+                <Monitor size={12} style={{ display: "inline", marginRight: 5 }} aria-hidden="true" />
+                Desktop
+              </button>
+              <button
+                type="button"
+                className={`adm-tab${previewDevice === "mobile" ? " is-active" : ""}`}
+                onClick={() => setPreviewDevice("mobile")}
+              >
+                <Smartphone size={12} style={{ display: "inline", marginRight: 5 }} aria-hidden="true" />
+                Mobile
+              </button>
+            </div>
+            <button
+              type="button"
+              className="adm-btn adm-btn-sm"
+              onClick={() => setPreviewKey((k) => k + 1)}
+              title="Reload live preview"
+            >
+              <RefreshCw size={13} aria-hidden="true" />
+              <span>Reload</span>
+            </button>
+            <a href="/" target="_blank" rel="noopener noreferrer" className="adm-btn adm-btn-sm adm-btn-primary">
+              <span>Full Screen</span>
+              <ArrowUpRight size={13} aria-hidden="true" />
+            </a>
+          </div>
+        </div>
+
+        <div className={`adm-site-preview-wrap${previewDevice === "mobile" ? " is-mobile" : ""}`}>
+          <iframe
+            key={previewKey}
+            src="/"
+            title="Live deployed portfolio preview"
+            className="adm-site-frame"
+          />
         </div>
       </div>
     </>

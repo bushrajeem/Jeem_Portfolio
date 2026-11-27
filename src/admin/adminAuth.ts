@@ -15,6 +15,11 @@ import { COLLECTIONS } from "../lib/firestore";
 import { app, getFirestoreDb } from "../lib/firebase";
 import { getErrorCode } from "./errors";
 
+/** Only this verified Google email is permitted to enter Admin Studio. */
+export const OWNER_EMAIL = (
+  import.meta.env.VITE_ADMIN_EMAIL?.trim() || "bushrajeem32@gmail.com"
+).toLowerCase();
+
 /** Auto-lock after 15 minutes without mouse/keyboard activity. */
 export const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
 /** Force a fresh Google sign-in at least every 12 hours. */
@@ -47,7 +52,10 @@ export function watchAuth(callback: (user: User | null) => void): () => void {
 
 export async function signInWithGoogle(): Promise<User> {
   const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: "select_account" });
+  provider.setCustomParameters({
+    prompt: "select_account",
+    login_hint: OWNER_EMAIL,
+  });
   const credential = await signInWithPopup(getAdminAuth(), provider);
   return credential.user;
 }
@@ -64,6 +72,10 @@ export async function getSessionStartedAt(user: User): Promise<number> {
 
 export function isGoogleVerified(user: User): boolean {
   return user.emailVerified && user.providerData.some((p) => p.providerId === "google.com");
+}
+
+export function isOwnerEmail(user: User): boolean {
+  return typeof user.email === "string" && user.email.trim().toLowerCase() === OWNER_EMAIL;
 }
 
 /**

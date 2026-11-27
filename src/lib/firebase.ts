@@ -1,6 +1,7 @@
 import { getApp, getApps, initializeApp, type FirebaseApp, type FirebaseOptions } from "firebase/app";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 import { getFirestore, type Firestore } from "firebase/firestore";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY?.trim(),
@@ -57,6 +58,7 @@ if (app && isFreshApp && appCheckSiteKey && isConfiguredValue(appCheckSiteKey)) 
 }
 
 export const db: Firestore | null = app ? getFirestore(app) : null;
+export const storage: FirebaseStorage | null = app ? getStorage(app) : null;
 
 export function getFirestoreDb(): Firestore {
   if (!db) {
@@ -65,4 +67,13 @@ export function getFirestoreDb(): Firestore {
     );
   }
   return db;
+}
+
+export function getFirebaseStorage(): FirebaseStorage {
+  if (!storage) {
+    throw new Error(
+      "Firebase Storage is not configured yet. Add your VITE_FIREBASE_* keys to .env.local and restart the dev server.",
+    );
+  }
+  return storage;
 }

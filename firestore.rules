@@ -3,14 +3,13 @@ rules_version = '2';
 // ─────────────────────────────────────────────────────────────────────────────
 //  Jeem Portfolio · Firestore Security Rules
 //
-//  These rules are the REAL security boundary. The admin panel UI only hides
-//  buttons — every read/write below is enforced by Google's servers, so even a
-//  hacker calling the API directly with your public API key cannot change data.
+//  Locked strictly to ONLY your verified Google email + Firebase Auth UID.
+//  Even if another user signs in with Google or copies your public API key,
+//  Google's servers reject every admin read/write immediately.
 //
 //  ONE-TIME SETUP: replace PASTE_YOUR_ADMIN_UID_HERE with your Firebase Auth UID
-//  (the admin panel shows it to you after your first Google sign-in), then paste
-//  this whole file into Firebase Console → Firestore Database → Rules → Publish.
-//  To add another admin later: ['uid_one', 'uid_two'].
+//  (shown in Admin Studio when signed in with bushrajeem32@gmail.com), then
+//  paste into Firebase Console → Firestore Database → Rules → Publish.
 // ─────────────────────────────────────────────────────────────────────────────
 
 service cloud.firestore {
@@ -19,9 +18,10 @@ service cloud.firestore {
     // ── Helpers ──────────────────────────────────────────────────────────────
     function isAdmin() {
       return request.auth != null
-        && request.auth.uid in ['PASTE_YOUR_ADMIN_UID_HERE']
+        && request.auth.token.email == 'bushrajeem32@gmail.com'
         && request.auth.token.email_verified == true
-        && request.auth.token.firebase.sign_in_provider == 'google.com';
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.uid in ['PASTE_YOUR_ADMIN_UID_HERE'];
     }
 
     function validItemId(itemId) {
@@ -78,8 +78,6 @@ service cloud.firestore {
     }
 
     // ── Contact form inbox ───────────────────────────────────────────────────
-    // Visitors may only CREATE a validated message. Only the admin can read,
-    // mark as read/unread (status field only) or delete messages.
     match /contactMessages/{messageId} {
       allow create: if request.resource.data.keys().hasOnly([
           'name',
@@ -108,8 +106,6 @@ service cloud.firestore {
     }
 
     // ── Tamper-proof audit log ───────────────────────────────────────────────
-    // Every admin commit writes one entry. Nobody (not even the admin) can edit
-    // or delete entries, so you always know exactly what changed and when.
     match /auditLog/{entryId} {
       allow read: if isAdmin();
       allow create: if isAdmin()

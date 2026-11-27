@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Check, Copy, KeyRound, Lock, ShieldCheck, ShieldAlert, Terminal } from "lucide-react";
+import { Check, Copy, HardDrive, KeyRound, Lock, ShieldAlert, ShieldCheck, Terminal } from "lucide-react";
 import { subscribeToAudit, type AuditEntry } from "../adminData";
-import { IDLE_TIMEOUT_MS, MAX_SESSION_MS } from "../adminAuth";
+import { IDLE_TIMEOUT_MS, MAX_SESSION_MS, OWNER_EMAIL } from "../adminAuth";
 import { describeError } from "../errors";
 import { useAdminSession } from "../session";
 
@@ -12,9 +12,10 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function isAdmin() {
       return request.auth != null
-        && request.auth.uid in ['${uid}']
+        && request.auth.token.email == '${OWNER_EMAIL}'
         && request.auth.token.email_verified == true
-        && request.auth.token.firebase.sign_in_provider == 'google.com';
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.uid in ['${uid}'];
     }
 
     function validItemId(itemId) {
@@ -114,11 +115,48 @@ service cloud.firestore {
 }`;
 }
 
+export function buildStorageRulesWithUid(uid: string): string {
+  return `rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == '${OWNER_EMAIL}'
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.uid in ['${uid}'];
+    }
+
+    function isValidImage() {
+      return request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('^image/(jpeg|png|webp)$');
+    }
+
+    function isValidPdf() {
+      return request.resource.size <= 10 * 1024 * 1024
+        && request.resource.contentType == 'application/pdf';
+    }
+
+    match /portfolio/media/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin() && (isValidImage() || isValidPdf());
+      allow delete: if isAdmin();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}`;
+}
+
 export function SecurityAuditSection({ idleRemainingSec }: { idleRemainingSec: number }) {
   const { actor, toast } = useAdminSession();
   const [entries, setEntries] = useState<AuditEntry[]>([]);
   const [copiedUid, setCopiedUid] = useState(false);
   const [copiedRules, setCopiedRules] = useState(false);
+  const [copiedStorageRules, setCopiedStorageRules] = useState(false);
 
   const appCheckEnabled = Boolean(import.meta.env.VITE_FIREBASE_APPCHECK_SITE_KEY?.trim());
 
@@ -253,7 +291,7 @@ export function SecurityAuditSection({ idleRemainingSec }: { idleRemainingSec: n
         <div className="adm-card-head">
           <div className="adm-card-title">
             <Terminal size={16} aria-hidden="true" />
-            <h2>Firestore Security Rules (Pre-filled with your UID)</h2>
+            <h2>Firestore Security Rules (Pre-filled with your Email + UID)</h2>
           </div>
           <button
             type="button"
@@ -265,6 +303,26 @@ export function SecurityAuditSection({ idleRemainingSec }: { idleRemainingSec: n
           </button>
         </div>
         <pre className="adm-code-block">{buildRulesWithUid(actor.uid)}</pre>
+      </div>
+
+      <div className="adm-card">
+        <div className="adm-card-head">
+          <div className="adm-card-title">
+            <HardDrive size={16} aria-hidden="true" />
+            <h2>Firebase Storage Rules (For Media &amp; CV Uploads)</h2>
+          </div>
+          <button
+            type="button"
+            className="adm-btn adm-btn-sm adm-btn-primary"
+            onClick={() =>
+              void copyText(buildStorageRulesWithUid(actor.uid), setCopiedStorageRules, "Storage rules")
+            }
+          >
+            {copiedStorageRules ? <Check size={13} /> : <Copy size={13} />}
+            <span>{copiedStorageRules ? "Copied Storage Rules" : "Copy Storage Rules"}</span>
+          </button>
+        </div>
+        <pre className="adm-code-block">{buildStorageRulesWithUid(actor.uid)}</pre>
       </div>
 
       <div className="adm-card">

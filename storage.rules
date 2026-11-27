@@ -1,0 +1,42 @@
+rules_version = '2';
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Jeem Portfolio · Firebase Storage Security Rules
+//
+//  Paste into Firebase Console → Build → Storage → Rules → Publish.
+//  Replace PASTE_YOUR_ADMIN_UID_HERE with your Firebase Auth UID.
+// ─────────────────────────────────────────────────────────────────────────────
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'bushrajeem32@gmail.com'
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.uid in ['PASTE_YOUR_ADMIN_UID_HERE'];
+    }
+
+    function isValidImage() {
+      return request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('^image/(jpeg|png|webp)$');
+    }
+
+    function isValidPdf() {
+      return request.resource.size <= 10 * 1024 * 1024
+        && request.resource.contentType == 'application/pdf';
+    }
+
+    // Uploaded portfolio assets (portrait, footer character, CV PDF)
+    match /portfolio/media/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin() && (isValidImage() || isValidPdf());
+      allow delete: if isAdmin();
+    }
+
+    // Deny everything else by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
