@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
-import { navLinks, profile } from "../data/portfolio";
+import { usePortfolio } from "../context/PortfolioContext";
 import { useTheme } from "../hooks/useTheme";
 import { GitHubLogo, LinkedInLogo } from "./ui/Logos";
 import { WaveText, ease } from "./ui/Motion";
 
-const primaryNav = navLinks.filter((l) => ["Projects", "About", "Contact"].includes(l.label));
-const secondaryNav = navLinks.filter((l) => !["Projects", "About", "Contact"].includes(l.label));
+const PRIMARY_NAV_LABELS = new Set(["Projects", "About", "Contact"]);
 
 type SpinState = {
   from: number;
@@ -19,6 +18,9 @@ type SpinState = {
 };
 
 export function Header() {
+  const { navLinks, profile } = usePortfolio();
+  const primaryNav = navLinks.filter((l) => PRIMARY_NAV_LABELS.has(l.label));
+  const secondaryNav = navLinks.filter((l) => !PRIMARY_NAV_LABELS.has(l.label));
   const { theme, toggle } = useTheme();
   const [open, setOpen] = useState(false);
   const wordmarkRef = useRef<HTMLSpanElement>(null);

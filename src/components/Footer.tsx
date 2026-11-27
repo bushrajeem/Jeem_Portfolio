@@ -1,9 +1,10 @@
 import { ArrowUpRight } from "lucide-react";
-import { navLinks, profile } from "../data/portfolio";
+import { usePortfolio } from "../context/PortfolioContext";
 import { FooterCrowd } from "./FooterCrowd";
 import { WaveText } from "./ui/Motion";
 
 export function Footer() {
+  const { navLinks, profile } = usePortfolio();
   return (
     <footer className="site-footer">
       <div className="wrap">

@@ -1,9 +1,10 @@
 import { ArrowDownRight, FileText } from "lucide-react";
-import { academics, bio, profile } from "../data/portfolio";
+import { usePortfolio } from "../context/PortfolioContext";
 import { Reveal, WaveText } from "./ui/Motion";
 import { Portrait } from "./ui/Portrait";
 
 export function Biography() {
+  const { academics, bio, profile } = usePortfolio();
   return (
     <div id="biography" className="biography wrap" aria-labelledby="about-heading">
       <Reveal className="bio-introduction">

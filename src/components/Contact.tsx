@@ -1,15 +1,33 @@
 import { useState, type FormEvent } from "react";
-import { ArrowUpRight, Check, Copy, FileText, Mail } from "lucide-react";
-import { profile } from "../data/portfolio";
+import { ArrowUpRight, Check, Copy, FileText, Loader2, Mail } from "lucide-react";
+import { usePortfolio } from "../context/PortfolioContext";
+import { isFirebaseConfigured } from "../lib/firebase";
+import { submitContactMessage } from "../lib/firestore";
 import { GitHubLogo, LinkedInLogo } from "./ui/Logos";
 import { Reveal, WaveText } from "./ui/Motion";
 
+type SubmitState = "idle" | "submitting" | "sent" | "draft" | "error";
+
 export function Contact() {
+  const { profile } = usePortfolio();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [copied, setCopied] = useState(false);
+  const [submitState, setSubmitState] = useState<SubmitState>("idle");
+  const [feedback, setFeedback] = useState<string>("");
   const [draftUrl, setDraftUrl] = useState<string | null>(null);
+
+  const buildMailtoUrl = () => {
+    const sender = name.trim() || "Portfolio visitor";
+    const subject = encodeURIComponent(`Hello Jeem — from ${sender}`);
+    const bodyLines = [
+      message.trim() || "Hi Jeem,",
+      "",
+      `— ${sender}${email.trim() ? ` (${email.trim()})` : ""}`,
+    ];
+    return `mailto:${profile.email}?subject=${subject}&body=${encodeURIComponent(bodyLines.join("\n"))}`;
+  };
 
   const handleCopy = async () => {
     try {
@@ -21,19 +39,42 @@ export function Contact() {
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const sender = name.trim() || "Portfolio visitor";
-    const subject = encodeURIComponent(`Hello Jeem — from ${sender}`);
-    const bodyLines = [
-      message.trim() || "Hi Jeem,",
-      "",
-      `— ${sender}${email.trim() ? ` (${email.trim()})` : ""}`,
-    ];
-    const url = `mailto:${profile.email}?subject=${subject}&body=${encodeURIComponent(bodyLines.join("\n"))}`;
-    setDraftUrl(url);
-    window.location.href = url;
+
+    if (!isFirebaseConfigured) {
+      const url = buildMailtoUrl();
+      setDraftUrl(url);
+      setSubmitState("draft");
+      setFeedback("Your email draft is ready.");
+      window.location.href = url;
+      return;
+    }
+
+    setSubmitState("submitting");
+    setFeedback("");
+    setDraftUrl(null);
+
+    try {
+      await submitContactMessage({ name, email, message });
+      setName("");
+      setEmail("");
+      setMessage("");
+      setSubmitState("sent");
+      setFeedback("Message sent! Thanks for reaching out — I'll get back to you soon.");
+    } catch (err) {
+      const fallbackUrl = buildMailtoUrl();
+      setDraftUrl(fallbackUrl);
+      setSubmitState("error");
+      const reason =
+        err instanceof Error && err.message
+          ? err.message
+          : "Could not send right now.";
+      setFeedback(`${reason} You can also open your message in your mail client.`);
+    }
   };
+
+  const isSubmitting = submitState === "submitting";
 
   return (
     <section id="contact" className="contact-section wrap" aria-labelledby="contact-heading">
@@ -145,9 +186,23 @@ export function Contact() {
             </div>
 
             <div className="contact-submit">
-              <button type="submit" className="draft-button wave-target">
-                <WaveText>Create email draft</WaveText>
-                <ArrowUpRight size={18} />
+              <button
+                type="submit"
+                className="draft-button wave-target"
+                disabled={isSubmitting}
+              >
+                <WaveText>
+                  {isSubmitting
+                    ? "Sending..."
+                    : isFirebaseConfigured
+                      ? "Send message"
+                      : "Create email draft"}
+                </WaveText>
+                {isSubmitting ? (
+                  <Loader2 size={18} className="contact-spinner" aria-hidden="true" />
+                ) : (
+                  <ArrowUpRight size={18} />
+                )}
               </button>
 
               <a href={`mailto:${profile.email}`} className="text-link wave-target">
@@ -156,13 +211,19 @@ export function Contact() {
               </a>
             </div>
 
-            {draftUrl && (
-              <div className="draft-ready" role="status" aria-live="polite">
-                <p>Your email draft is ready.</p>
-                <a href={draftUrl} className="draft-link">
-                  <span>Open in mail client</span>
-                  <ArrowUpRight size={15} />
-                </a>
+            {feedback && (
+              <div
+                className={`draft-ready${submitState === "error" ? " contact-feedback-error" : ""}`}
+                role={submitState === "error" ? "alert" : "status"}
+                aria-live="polite"
+              >
+                <p>{feedback}</p>
+                {draftUrl && (
+                  <a href={draftUrl} className="draft-link">
+                    <span>Open in mail client</span>
+                    <ArrowUpRight size={15} />
+                  </a>
+                )}
               </div>
             )}
           </form>

@@ -1,6 +1,6 @@
 import { ArrowUp } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import { profile } from "../data/portfolio";
+import { usePortfolio } from "../context/PortfolioContext";
 
 const SHEETS = [
   "/footer/crowd-01.webp",
@@ -36,6 +36,7 @@ function hash(n: number) {
  * Click anywhere on the stage to pause or resume.
  */
 export function FooterCrowd() {
+  const { profile } = usePortfolio();
   const stageRef = useRef<HTMLButtonElement>(null);
   const backCanvasRef = useRef<HTMLCanvasElement>(null);
   const frontCanvasRef = useRef<HTMLCanvasElement>(null);

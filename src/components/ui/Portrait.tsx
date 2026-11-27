@@ -1,4 +1,4 @@
-import { profile } from "../../data/portfolio";
+import { usePortfolio } from "../../context/PortfolioContext";
 
 type PortraitProps = {
   className?: string;
@@ -17,6 +17,7 @@ export function Portrait({
   grayscale = false,
   decorative = false,
 }: PortraitProps) {
+  const { profile } = usePortfolio();
   return (
     <div
       className={`portrait-frame relative m-0 h-full w-full overflow-hidden bg-zinc-950 ring-1 ring-white/15 ring-inset ${className}`}

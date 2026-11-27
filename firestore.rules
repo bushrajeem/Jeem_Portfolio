@@ -1,0 +1,134 @@
+rules_version = '2';
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Jeem Portfolio · Firestore Security Rules
+//
+//  These rules are the REAL security boundary. The admin panel UI only hides
+//  buttons — every read/write below is enforced by Google's servers, so even a
+//  hacker calling the API directly with your public API key cannot change data.
+//
+//  ONE-TIME SETUP: replace PASTE_YOUR_ADMIN_UID_HERE with your Firebase Auth UID
+//  (the admin panel shows it to you after your first Google sign-in), then paste
+//  this whole file into Firebase Console → Firestore Database → Rules → Publish.
+//  To add another admin later: ['uid_one', 'uid_two'].
+// ─────────────────────────────────────────────────────────────────────────────
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.uid in ['PASTE_YOUR_ADMIN_UID_HERE']
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    function validItemId(itemId) {
+      return itemId.matches('^[a-z0-9][a-z0-9-]{0,59}$');
+    }
+
+    function stampedNow() {
+      return request.resource.data.updatedAt == request.time;
+    }
+
+    function validCollectionItem(itemId) {
+      return isAdmin()
+        && validItemId(itemId)
+        && stampedNow()
+        && request.resource.data.order is int
+        && request.resource.data.order >= 0
+        && request.resource.data.order <= 1000
+        && request.resource.data.visible is bool
+        && request.resource.data.size() <= 30;
+    }
+
+    // ── Public portfolio content (anyone can read, only admin can write) ─────
+    match /portfolio/{docId} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && docId in ['profile', 'academics', 'hero', 'bio', 'navigation']
+        && stampedNow()
+        && request.resource.data.size() <= 30;
+      allow delete: if false;
+    }
+
+    match /skills/{itemId} {
+      allow read: if true;
+      allow create, update: if validCollectionItem(itemId);
+      allow delete: if isAdmin();
+    }
+
+    match /projects/{itemId} {
+      allow read: if true;
+      allow create, update: if validCollectionItem(itemId);
+      allow delete: if isAdmin();
+    }
+
+    match /journey/{itemId} {
+      allow read: if true;
+      allow create, update: if validCollectionItem(itemId);
+      allow delete: if isAdmin();
+    }
+
+    match /milestones/{itemId} {
+      allow read: if true;
+      allow create, update: if validCollectionItem(itemId);
+      allow delete: if isAdmin();
+    }
+
+    // ── Contact form inbox ───────────────────────────────────────────────────
+    // Visitors may only CREATE a validated message. Only the admin can read,
+    // mark as read/unread (status field only) or delete messages.
+    match /contactMessages/{messageId} {
+      allow create: if request.resource.data.keys().hasOnly([
+          'name',
+          'email',
+          'message',
+          'status',
+          'createdAt'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 120
+        && request.resource.data.email is string
+        && request.resource.data.email.size() > 3
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 5000
+        && request.resource.data.status == 'unread'
+        && request.resource.data.createdAt == request.time;
+
+      allow read, delete: if isAdmin();
+
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['read', 'unread'];
+    }
+
+    // ── Tamper-proof audit log ───────────────────────────────────────────────
+    // Every admin commit writes one entry. Nobody (not even the admin) can edit
+    // or delete entries, so you always know exactly what changed and when.
+    match /auditLog/{entryId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['action', 'section', 'uid', 'email', 'at'])
+        && request.resource.data.keys().hasAll(['action', 'section', 'uid', 'email', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.at == request.time
+        && request.resource.data.action is string
+        && request.resource.data.action.size() <= 200
+        && request.resource.data.section is string
+        && request.resource.data.section.size() <= 40
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 254;
+      allow update, delete: if false;
+    }
+
+    // ── Everything else is locked ────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,7 +1,8 @@
-import { skills } from "../data/portfolio";
+import { usePortfolio } from "../context/PortfolioContext";
 import { Reveal } from "./ui/Motion";
 
 export function Skills() {
+  const { skills } = usePortfolio();
   return (
     <section id="skills" className="skills-section" aria-labelledby="skills-heading">
       <div className="wrap">

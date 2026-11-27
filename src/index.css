@@ -384,12 +384,17 @@
   .contact-form input:focus, .contact-form textarea:focus { outline: 2px solid var(--sc-ink); outline-offset: 5px; border-color: var(--sc-ink); }
   .contact-message, .contact-submit, .draft-ready { grid-column: 1 / -1; }
   .contact-submit { flex-wrap: wrap; align-items: center; gap: 20px; display: flex; }
-  .draft-button { background: var(--sc-ink); color: var(--sc-canvas); border: 0; border-radius: 6px; display: inline-flex; align-items: center; gap: 32px; min-height: 56px; padding: 16px 22px; font-size: 15px; font-weight: 600; transition: transform 0.18s; }
-  .draft-button:active { transform: scale(0.97); }
+  .draft-button { background: var(--sc-ink); color: var(--sc-canvas); border: 0; border-radius: 6px; display: inline-flex; align-items: center; gap: 32px; min-height: 56px; padding: 16px 22px; font-size: 15px; font-weight: 600; transition: transform 0.18s, opacity 0.18s; }
+  .draft-button:disabled { opacity: 0.7; cursor: wait; }
+  .draft-button:active:not(:disabled) { transform: scale(0.97); }
   .draft-button > svg { transition: transform 0.3s var(--ease); flex-shrink: 0; }
-  .draft-button:hover > svg, .draft-button:focus-visible > svg { transform: translate(3px, -3px); }
+  .draft-button:hover:not(:disabled) > svg, .draft-button:focus-visible:not(:disabled) > svg { transform: translate(3px, -3px); }
+  .contact-spinner { animation: contact-spin 0.9s linear infinite; }
+  @keyframes contact-spin { to { transform: rotate(360deg); } }
   .draft-ready { border-top: 1px solid var(--line); flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding-top: 20px; display: flex; }
   .draft-ready p { margin: 0; font-size: 15px; font-weight: 600; }
+  .contact-feedback-error p { color: #b91c1c; }
+  :root[data-theme="dark"] .contact-feedback-error p { color: #fca5a5; }
   .draft-link { text-underline-offset: 5px; align-items: center; gap: 12px; min-height: 44px; font-size: 15px; text-decoration: underline; display: inline-flex; }
 
   /* ───── Footer + Interactive Crowd Scene (mirrors aswinpanengal.me) ───── */

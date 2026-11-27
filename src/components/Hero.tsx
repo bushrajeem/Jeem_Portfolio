@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { hero, heroCode, profile } from "../data/portfolio";
+import { usePortfolio } from "../context/PortfolioContext";
 import { GlyphBackground } from "./ui/GlyphBackground";
 import { Portrait } from "./ui/Portrait";
 
@@ -53,6 +53,7 @@ function HeroCodeMark({ side, visible }: { side: "open" | "close"; visible: bool
 }
 
 export function Hero() {
+  const { hero, heroCode, profile } = usePortfolio();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const terminalRef = useRef<HTMLSpanElement>(null);
   const [titleVisible, setTitleVisible] = useState(false);
@@ -152,7 +153,7 @@ export function Hero() {
             const dir = lineIdx === 0 ? 1 : -1;
             const chars = Array.from(line);
             return (
-              <span key={line} className="title-line" aria-hidden="true">
+              <span key={`${lineIdx}-${line}`} className="title-line" aria-hidden="true">
                 <span className="hero-word">
                   <HeroCodeMark side={lineIdx === 0 ? "open" : "close"} visible={titleVisible} />
 

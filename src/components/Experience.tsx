@@ -1,20 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { journey, milestones } from "../data/portfolio";
+import { usePortfolio } from "../context/PortfolioContext";
 import { Reveal, ease } from "./ui/Motion";
 
 export function Experience() {
+  const { journey, milestones } = usePortfolio();
   const roadmapRef = useRef<HTMLDivElement>(null);
   const markerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [roadPath, setRoadPath] = useState("");
 
   useEffect(() => {
+    markerRefs.current = markerRefs.current.slice(0, journey.length);
+
     const computePath = () => {
       const container = roadmapRef.current;
       if (!container) return;
 
       const box = container.getBoundingClientRect();
       const points = markerRefs.current
+        .slice(0, journey.length)
         .map((el) => {
           if (!el) return null;
           const r = el.getBoundingClientRect();
@@ -25,7 +29,10 @@ export function Experience() {
         })
         .filter((p): p is { x: number; y: number } => p !== null);
 
-      if (points.length < 2) return;
+      if (points.length < 2) {
+        setRoadPath("");
+        return;
+      }
 
       const segments = points.map((pt, i) => {
         if (i === 0) return `M ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`;
@@ -46,7 +53,7 @@ export function Experience() {
       observer.disconnect();
       window.removeEventListener("resize", computePath);
     };
-  }, []);
+  }, [journey]);
 
   return (
     <section id="experience" className="experience-section" aria-labelledby="experience-heading">

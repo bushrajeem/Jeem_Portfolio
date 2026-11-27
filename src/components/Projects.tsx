@@ -14,11 +14,13 @@ import {
   Send,
   X,
 } from "lucide-react";
-import { profile, projects, type ArchitectureMode, type Project } from "../data/portfolio";
+import { usePortfolio } from "../context/PortfolioContext";
+import { type ArchitectureMode, type Project } from "../data/portfolio";
 import { Reveal, WaveText, ease } from "./ui/Motion";
 
 function ArchitectureExhibit({ modes }: { modes: ArchitectureMode[] }) {
-  const [activeId, setActiveId] = useState(modes[0].id);
+  const [activeId, setActiveId] = useState(modes[0]?.id ?? "");
+  if (modes.length === 0) return null;
   const current = modes.find((m) => m.id === activeId) ?? modes[0];
 
   return (
@@ -90,8 +92,8 @@ function ArchitectureExhibit({ modes }: { modes: ArchitectureMode[] }) {
   );
 }
 
-function ProjectStudy({ project }: { project: Project }) {
-  const primaryHref = project.links[0]?.href ?? profile.github;
+function ProjectStudy({ project, fallbackHref }: { project: Project; fallbackHref: string }) {
+  const primaryHref = project.links[0]?.href ?? fallbackHref;
 
   return (
     <motion.article
@@ -191,6 +193,7 @@ function ProjectStudy({ project }: { project: Project }) {
 }
 
 export function Projects() {
+  const { profile, projects } = usePortfolio();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -350,7 +353,7 @@ export function Projects() {
             </div>
 
             <AnimatePresence mode="wait">
-              <ProjectStudy key={selectedProject.id} project={selectedProject} />
+              <ProjectStudy key={selectedProject.id} project={selectedProject} fallbackHref={profile.github} />
             </AnimatePresence>
           </>
         )}
